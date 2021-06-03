@@ -1,13 +1,9 @@
 package br.com.nunesonline.todolistapi;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class ToDoListApiApplicationTests {
-
-	@Test
+class TodoListApiApplicationTests {
+    
 	void contextLoads() {
+            
 	}
 
 }

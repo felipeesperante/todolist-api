@@ -7,48 +7,36 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "comments")
 @Data
-public class Task {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uuid")
     private String id;
-    
-    @Column(name = "description")
-    private String description;
-    
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    
     @Column(name = "last_modified")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModified;
+    @Column(name = "comment")
+    private String comment;
     
-    @Column(name = "has_comments")
-    private boolean hasComments;
+    @ManyToOne
+    @JoinColumn(name = "comment_by")
+    private User commentBy;
     
-    @Column(name = "time_spent")
-    private Integer timeSpent;
-    
-    @Column(name = "is_completed")
-    private boolean isCompleted;
-    
-    @Column(name = "schedule_to")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date scheduledTo;
-    
-    @OneToMany
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+    @ManyToOne
+    @JoinColumn(name = "comment_at_task")
+    private Task commentAtTask;
 
 }
