@@ -5,7 +5,4 @@ import lombok.Data;
 @Data
 public class LoginSENT extends DefaultSENT{
     
-    private String login;
-    private String passwd;
-    
 }

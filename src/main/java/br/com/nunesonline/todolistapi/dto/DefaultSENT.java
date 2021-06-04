@@ -1,7 +1,13 @@
 package br.com.nunesonline.todolistapi.dto;
 
+import javax.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
 public class DefaultSENT {
-    
-    private String jwt;
+    @NotNull
+    private String login;
+    @NotNull
+    private String passwd;
     
 }

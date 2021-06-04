@@ -7,20 +7,23 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "tasks")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "uuid")
+    @Column(name = "uuid") //todo unusual field name, but time is money to refactor
     private String id;
     
     @Column(name = "description")
@@ -47,8 +50,7 @@ public class Task {
     @Temporal(TemporalType.TIMESTAMP)
     private Date scheduledTo;
     
-    @OneToMany
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+    @Column(name = "created_by")
+    private String createdBy; //todo map proper relationship here
 
 }
