@@ -35,35 +35,6 @@ public class TodoListService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public Optional<User> verifyLogin(String login, String passwd)
-            throws Exception {
-        if (Objects.isNull(login) || Objects.isNull(passwd)) {
-            throw new Exception("Login/passwd must be informed");
-        }
-
-        Optional<User> user = this.userRepository.findByLogin(login);
-
-        //TODO apply cripto
-        if (!user.get().getPasswd().equals(passwd)) {
-            throw new Exception("Invalid password.");
-        }
-        user.get().setLastLogin(DateUtil.formatToDtHrMinSec(new Date()));
-        user.get().setLogged(true);
-        this.userRepository.save(user.get());
-        logger.info("User " + login + " has logged.");
-        return user;
-    }
-
-    public void terminateLogin(String login)
-            throws Exception {
-        if (Objects.isNull(login)) {
-            throw new Exception("Login must be informed");
-        }
-        Optional<User> user = this.userRepository.findByLogin(login);
-        user.get().setLogged(false);
-        this.userRepository.save(user.get());
-    }
-
     public void saveNewUser(String login, String passwd, String email)
             throws Exception {
         try {
@@ -91,10 +62,11 @@ public class TodoListService {
 
     public void updateUser(UserSENT env) throws Exception {
         try {
-            Optional<User> user = verifyLogin(env.getLogin(), env.getPasswd());
-            if (user.isPresent() && user.get().isLogged()) {
+            Optional<User> user = this.userRepository.findByLogin(env.getLogin());
+            if (user.isPresent()) {
                 User newUser = user.get();
                 newUser.setEmail(env.getEmail());
+                newUser.setEmail(env.getPasswd());
                 userRepository.save(newUser);
                 logger.info("User: " + env.getLogin() + " has been updated.");
             } else {
@@ -104,8 +76,6 @@ public class TodoListService {
         } catch (Exception e) {
             logger.info("Error creating user: " + env.getLogin() + ". Cause: " + e.getMessage());
             throw new Exception("Update user failed. Cause:" + e.getMessage());
-        } finally {
-            terminateLogin(env.getLogin());
         }
     }
 
@@ -143,8 +113,8 @@ public class TodoListService {
 
     public void saveNewTask(TaskSENT env) throws Exception {
         try {
-            Optional<User> user = verifyLogin(env.getLogin(), env.getPasswd());
-            if (user.isPresent() && user.get().isLogged()) {
+            Optional<User> user = this.userRepository.findByLogin(env.getLogin());
+            if (user.isPresent()) {
                 Task newTask = new Task();
                 newTask.setCompleted(env.isCompleted());
                 newTask.setCreatedAt(DateUtil.formatToDtHrMinSec(new Date()));
@@ -166,15 +136,13 @@ public class TodoListService {
         } catch (Exception e) {
             logger.info("Error creating task: " + env.getLogin() + ". Cause: " + e.getMessage());
             throw new Exception("Creat task failed. Cause:" + e.getMessage());
-        } finally {
-            terminateLogin(env.getLogin());
         }
     }
 
     public void editTask(TaskSENT env) throws Exception {
         try {
-            Optional<User> user = verifyLogin(env.getLogin(), env.getPasswd());
-            if (user.isPresent() && user.get().isLogged()) {
+            Optional<User> user = this.userRepository.findByLogin(env.getLogin());
+            if (user.isPresent()) {
                 Optional<Task> savedTask = taskRepository.findById(env.getId());
                 if (savedTask.isPresent()) {
                     savedTask.get().setCompleted(env.isCompleted());
@@ -195,8 +163,6 @@ public class TodoListService {
         } catch (Exception e) {
             logger.info("Error creating task: " + env.getLogin() + ". Cause: " + e.getMessage());
             throw new Exception("Update task failed. Cause:" + e.getMessage());
-        } finally {
-            terminateLogin(env.getLogin());
         }
     }
 
@@ -226,7 +192,7 @@ public class TodoListService {
         }
     }
 
-    public List<TaskRET> findTaskByUserId(String id) throws Exception{
+    public List<TaskRET> findTaskByUserId(String id) throws Exception {
         List<TaskRET> ret = new ArrayList<>();
         Optional<User> u = this.userRepository.findById(id);
         if (u.isPresent()) {
@@ -270,7 +236,7 @@ public class TodoListService {
     }
 
     public void saveNewComment(CommentSENT env) throws Exception {
-        Optional<User> user = verifyLogin(env.getLogin(), env.getPasswd());
+        Optional<User> user = this.userRepository.findByLogin(env.getLogin());
         if (user.isPresent()) {
             Comment newComment = new Comment();
             newComment.setComment(env.getComment());
@@ -279,9 +245,9 @@ public class TodoListService {
             newComment.setId(Generator.generateId());
             newComment.setLastModified(null);
             commentRepository.save(newComment);
-            
+
             Optional<Task> taskSaved = taskRepository.findById(env.getCommentAtTask());
-            if(taskSaved.isPresent()){
+            if (taskSaved.isPresent()) {
                 taskSaved.get().setHasComments(true);
                 taskRepository.save(taskSaved.get());
             }
@@ -289,9 +255,8 @@ public class TodoListService {
     }
 
     public void updateComment(CommentSENT env) throws Exception {
-        Optional<User> user = verifyLogin(env.getLogin(), env.getPasswd());
+        Optional<User> user = this.userRepository.findByLogin(env.getLogin());
         if (user.isPresent()) {
-
             Optional<Comment> commentSaved = commentRepository.findById(env.getId());
             if (commentSaved.isPresent()) {
                 commentSaved.get().setComment(env.getComment());

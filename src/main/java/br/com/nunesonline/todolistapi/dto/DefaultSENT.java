@@ -7,7 +7,5 @@ import lombok.Data;
 public class DefaultSENT {
     @NotNull
     private String login;
-    @NotNull
-    private String passwd;
     
 }

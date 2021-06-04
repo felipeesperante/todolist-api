@@ -1,12 +1,9 @@
 package br.com.nunesonline.todolistapi.rest;
 
-import br.com.nunesonline.todolistapi.dto.CommentSENT;
-import br.com.nunesonline.todolistapi.dto.DefaultRET;
-import br.com.nunesonline.todolistapi.dto.TaskRET;
-import br.com.nunesonline.todolistapi.dto.TaskSENT;
-import br.com.nunesonline.todolistapi.dto.UserRET;
-import br.com.nunesonline.todolistapi.dto.UserSENT;
+import br.com.nunesonline.todolistapi.dto.*;
+import br.com.nunesonline.todolistapi.service.JwtUserDetailsService;
 import br.com.nunesonline.todolistapi.service.TodoListService;
+import br.com.nunesonline.todolistapi.util.JwtTokenUtil;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -20,6 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.HttpStatus.OK;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
@@ -52,7 +54,7 @@ public class TodoListApiREST {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/user")
-    public ResponseEntity<DefaultRET> creatUser(@Valid @RequestBody UserSENT env) {
+    public ResponseEntity<DefaultRET> createUser(@Valid @RequestBody UserSENT env) {
         DefaultRET ret = new DefaultRET();
         try {
             //validate login/passwd before a service call

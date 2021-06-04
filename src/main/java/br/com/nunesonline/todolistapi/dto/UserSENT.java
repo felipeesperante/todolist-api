@@ -7,4 +7,5 @@ import lombok.Data;
 public class UserSENT extends DefaultSENT{
     @NotNull
     private String email;
+    private String passwd;
 }
