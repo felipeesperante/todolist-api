@@ -34,19 +34,19 @@ public class AuthorizationREST {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        authenticate(authenticationRequest.getLogin(), authenticationRequest.getPasswd());
 
         final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .loadUserByUsername(authenticationRequest.getLogin());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         return new ResponseEntity<>(new JwtResponse(token), OK);
     }
 
-    private void authenticate(String username, String password) throws Exception {
+    private void authenticate(String login, String passwd) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, passwd));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

@@ -1,9 +1,7 @@
 package br.com.nunesonline.todolistapi.rest;
 
 import br.com.nunesonline.todolistapi.dto.*;
-import br.com.nunesonline.todolistapi.service.JwtUserDetailsService;
 import br.com.nunesonline.todolistapi.service.TodoListService;
-import br.com.nunesonline.todolistapi.util.JwtTokenUtil;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -16,12 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import static org.springframework.http.HttpStatus.OK;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import static org.springframework.http.HttpStatus.*;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
@@ -49,7 +42,7 @@ public class TodoListApiREST {
             UserRET ret = todoListService.findOneById(id);
             return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, OK);
+            return new ResponseEntity<>(null, INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,11 +54,13 @@ public class TodoListApiREST {
             todoListService.saveNewUser(env.getLogin(), env.getPasswd(), env.getEmail());
             ret.setCd("200");
             ret.setMsg("Login Accepted");
+            return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
             ret.setCd("500");
             ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(ret, INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(ret, OK);
+        
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user")
@@ -78,6 +73,7 @@ public class TodoListApiREST {
         } catch (Exception e) {
             ret.setCd("500");
             ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(ret, INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(ret, OK);
     }
@@ -91,7 +87,7 @@ public class TodoListApiREST {
             TaskRET ret = todoListService.findTaskById(id);
             return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, OK);
+            return new ResponseEntity<>(null, INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -102,7 +98,7 @@ public class TodoListApiREST {
             List<TaskRET> ret = todoListService.findTaskByUserId(id);
             return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, OK);
+            return new ResponseEntity<>(null, INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -113,25 +109,44 @@ public class TodoListApiREST {
             todoListService.saveNewTask(env);
             ret.setCd("200");
             ret.setMsg("Task Accepted");
+            return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
             ret.setCd("500");
             ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(null, INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(ret, OK);
+        
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/task")
     public ResponseEntity<DefaultRET> editTask(@Valid @RequestBody TaskSENT env) {
         DefaultRET ret = new DefaultRET();
         try {
-            todoListService.saveNewTask(env);
+            todoListService.editTask(env);
             ret.setCd("200");
             ret.setMsg("Task Accepted");
+            return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
             ret.setCd("500");
             ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(ret, INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(ret, OK);
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/task")
+    public ResponseEntity<DefaultRET> deleteTask(@Valid @RequestBody TaskSENT env) {
+        DefaultRET ret = new DefaultRET();
+        try {
+            todoListService.deleteTask(env);
+            ret.setCd("200");
+            ret.setMsg("Task Accepted");
+            return new ResponseEntity<>(ret, OK);
+        } catch (Exception e) {
+            ret.setCd("500");
+            ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(ret, INTERNAL_SERVER_ERROR);
+        }
+        
     }
 
     /**
@@ -144,11 +159,12 @@ public class TodoListApiREST {
             todoListService.saveNewComment(env);
             ret.setCd("200");
             ret.setMsg("Comment Accepted");
+            return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
             ret.setCd("500");
             ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(ret, INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(ret, OK);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/comment")
@@ -158,10 +174,11 @@ public class TodoListApiREST {
             todoListService.updateComment(env);
             ret.setCd("200");
             ret.setMsg("Comment Accepted");
+            return new ResponseEntity<>(ret, OK);
         } catch (Exception e) {
             ret.setCd("500");
             ret.setMsg(e.getMessage());
+            return new ResponseEntity<>(ret, INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(ret, OK);
     }
 }

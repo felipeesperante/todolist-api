@@ -70,8 +70,8 @@ public class TodoListService {
                 userRepository.save(newUser);
                 logger.info("User: " + env.getLogin() + " has been updated.");
             } else {
-                logger.info("User: " + env.getLogin() + " is not logged.");
-                throw new Exception("User not logged");
+                logger.info("User: " + env.getLogin() + " is not found.");
+                throw new Exception("User not found");
             }
         } catch (Exception e) {
             logger.info("Error creating user: " + env.getLogin() + ". Cause: " + e.getMessage());
@@ -130,8 +130,8 @@ public class TodoListService {
                 taskRepository.save(newTask);
                 logger.info("Task has been created.");
             } else {
-                logger.info("User: " + env.getLogin() + " is not logged.");
-                throw new Exception("User not logged");
+                logger.info("User: " + env.getLogin() + " is not found.");
+                throw new Exception("User not found");
             }
         } catch (Exception e) {
             logger.info("Error creating task: " + env.getLogin() + ". Cause: " + e.getMessage());
@@ -157,8 +157,30 @@ public class TodoListService {
                     throw new Exception("Task not found");
                 }
             } else {
-                logger.info("User: " + env.getLogin() + " is not logged.");
-                throw new Exception("User not logged");
+                logger.info("User: " + env.getLogin() + " is not found.");
+                throw new Exception("User not found");
+            }
+        } catch (Exception e) {
+            logger.info("Error creating task: " + env.getLogin() + ". Cause: " + e.getMessage());
+            throw new Exception("Update task failed. Cause:" + e.getMessage());
+        }
+    }
+
+    public void deleteTask(TaskSENT env) throws Exception {
+        try {
+            Optional<User> user = this.userRepository.findByLogin(env.getLogin());
+            if (user.isPresent()) {
+                Optional<Task> savedTask = taskRepository.findById(env.getId());
+                if (savedTask.isPresent()) {
+                    taskRepository.delete(savedTask.get());
+                    logger.info("Task has been deleted.");
+                } else {
+                    logger.info("Task: " + env.getId() + " does not exist.");
+                    throw new Exception("Task not found");
+                }
+            } else {
+                logger.info("User: " + env.getLogin() + " is not found.");
+                throw new Exception("User not found");
             }
         } catch (Exception e) {
             logger.info("Error creating task: " + env.getLogin() + ". Cause: " + e.getMessage());
